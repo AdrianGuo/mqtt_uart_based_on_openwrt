@@ -1,0 +1,36 @@
+SERIAL CONSOLE (SC) README
+
+$Header: /cvsroot/serialconsole/sc/README,v 1.9 2009/03/06 00:32:24 doj Exp $
+
+
+BUILDING
+
+If your system is POSIX compliant (or reasonably close to being so), just
+running make will generate a binary.
+
+The Makefile has a number of knobs to adjust the compiled in defaults.
+
+Some systems don't have a working implementation of poll(2), among them
+Mac OS X 10.4.  You can enable a workaround in the Makefile by adding
+-DHAS_BROKEN_POLL to the CFLAGS.
+
+
+CHANGES
+
+0.95
+- add "-d" parameters which sets a delay after writing a newline character.
+- allow arbitrary characters to be composed with the escape character.
+
+0.94
+- Fix DTR setting code
+- By default, do not use work-around for broken poll(2)
+
+0.93
+- Allow control characters specified as -e "^a" for the escape character.
+- Make DTR control optional, add Linux compatible ioctl to set/reset DTR.
+
+0.92
+- First Public Release
+
+1.0
+- 现在按照自己的要求从0开始建造程序,首先空框架可以运行.然后使用非终端的串口和外部通讯,进行数据收发.
