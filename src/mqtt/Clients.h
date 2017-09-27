@@ -169,7 +169,7 @@ typedef struct
 	unsigned int connected : 1;		/**< whether it is currently connected */
 	unsigned int good : 1; 			/**< if we have an error on the socket we turn this off */
 	unsigned int ping_outstanding : 1;
-	int connect_state : 4;
+	int connect_state : 4;			/* 0:MQTT连接命令还没有完全发送出去; 1:TCP connect called - wait for connect completion; 2:SSL connect called - wait for completion; 3: MQTT Connect sent - wait for CONNACK; */
 	networkHandles net;
 	int msgID;
 	int keepAliveInterval;

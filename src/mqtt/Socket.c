@@ -50,6 +50,7 @@ int Socket_continueWrites(fd_set* pwset);
 /**
  * Structure to hold all socket data for the module
  */
+/* 链接了Socket的各种信息，链接了处于各种状态的待后续处理的Socket */
 Sockets s;
 static fd_set wset;
 

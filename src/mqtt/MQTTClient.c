@@ -71,6 +71,7 @@ static ClientStates ClientState =
 	NULL /* client list */
 };
 
+/* Ê¹ÓÃstatic±äÁ¿ClientStateÀ´Á´½Ó¿Í»§¶Ë×´Ì¬£¨¼´ClientsÀàÐÍµÄm->c£© */
 ClientStates* bstate = &ClientState;
 
 MQTTProtocol state;
@@ -130,8 +131,10 @@ void MQTTClient_init()	//-¿Í»§¶Ë³õÊ¼»¯
 #endif
 
 static volatile int initialized = 0;
+/* ¿Í»§¶ËÊµÌåÁ´½Ó×¨ÓÃ */
 static List* handles = NULL;
 static time_t last;
+/* ¿Í»§¶ËÉ¨ÃèÕýÔÚÔËÐÐ±êÖ¾ */
 static int running = 0;
 static int tostop = 0;
 static thread_id_type run_id = 0;
@@ -275,6 +278,7 @@ int MQTTClient_create(MQTTClient* handle, const char* serverURI, const char* cli
 		initialized = 1;	//-±£Ö¤½ö½ö³õÊ¼»¯Ò»´Î
 	}
 	m = malloc(sizeof(MQTTClients));
+	/* handleÊÇÃ¿¸ö¿Í»§¶Ëmqtt_new´´½¨Ê±malloc(sizeof(mqtt_client))µÄ1¸ö³ÉÔ±MQTTClient£¬ÔÚÕâÀïÓÃÓÚ¼ÇÂ¼ÊµÌå¶ÔÏómalloc(sizeof(MQTTClients))µÄµØÖ· */
 	*handle = m;	//-¸Õ¸Õ´´½¨ÁËÒ»¸ö¿Í»§¶Ë½á¹¹¶ÔÏó,ÓÃÓÚ±£´æÊý¾Ý
 	memset(m, '\0', sizeof(MQTTClients));
 	if (strncmp(URI_TCP, serverURI, strlen(URI_TCP)) == 0)	//-Èôstr1Óëstr2µÄÇ°n¸ö×Ö·ûÏàÍ¬£¬Ôò·µ»Ø0
@@ -472,7 +476,7 @@ thread_return_type WINAPI connectionLost_call(void* context)	//?°ü×°º¯Êý Ö¸¶¨Ïß³
 
 
 /* This is the thread function that handles the calling of callback functions if set */
-thread_return_type WINAPI MQTTClient_run(void* n)	//-*Ê¹ÓÃÒ»¸ö×¨ÃÅµÄÏß³ÌÎ¬»¤Ò»¸ö¿Í»§¶ËµÄÔËÐÐ
+thread_return_type WINAPI MQTTClient_run(void* n)	//-*Ê¹ÓÃÒ»¸ö×¨ÃÅµÄÏß³ÌÎ¬»¤Ò»¸ö¿Í»§¶ËµÄÔËÐÐ¡£¡£¡£¡£¿ÉÒÔÎ¬»¤¶à¸ö½¨Á¢¹ýÁ´½ÓµÄ¿Í»§¶Ë¡£¡£
 {
 	long timeout = 10L; /* first time in we have a small timeout.  Gets things started more quickly */
 
@@ -495,6 +499,7 @@ thread_return_type WINAPI MQTTClient_run(void* n)	//-*Ê¹ÓÃÒ»¸ö×¨ÃÅµÄÏß³ÌÎ¬»¤Ò»¸ö
 			break;
 		timeout = 1000L;
 
+		/* Ñ°ÕÒ½¨Á¢¹ýÁ´½ÓµÄ¿Í»§¶Ë */
 		/* find client corresponding to socket */
 		if (ListFindItem(handles, &sock, clientSockCompare) == NULL)	//-ÔÚÁ´±íÖÐÑ°ÕÒ¿Í»§¶Ë¶ÔÓ¦µÄÌ×½Ó×Ö
 		{
@@ -766,7 +771,7 @@ void Protocol_processPublication(Publish* publish, Clients* client)	//-´¦Àí½ÓÊÕµ
 	FUNC_EXIT;
 }
 
-//-ÏÂÃæÕë¶ÔÐ£Ñé¹ýµÄ²ÎÊý½øÐÐÁ¬½Ó
+//-ÏÂÃæÕë¶ÔÐ£Ñé¹ýµÄ²ÎÊý½øÐÐÁ¬½Ó£¬¶ÔÁ´½Ó¸÷¸ö²½ÖèÐèÒªµÈ´ýµÄ»òÕßÊ§°ÜµÄ½øÐÐ´¦Àí
 int MQTTClient_connectURIVersion(MQTTClient handle, MQTTClient_connectOptions* options, const char* serverURI, int MQTTVersion,
 	START_TIME_TYPE start, long millisecsTimeout)
 {
@@ -903,6 +908,8 @@ int MQTTClient_connectURIVersion(MQTTClient handle, MQTTClient_connectOptions* o
 				m->c->connect_state = 0;	//?ÊÕµ½Ó¦´ðÖ®ºó±äÎª0
 				if (MQTTVersion == 4)
 					sessionPresent = connack->flags.bits.sessionPresent;
+
+				/* ???? */
 				if (m->c->cleansession)
 					rc = MQTTClient_cleanSession(m->c);
 				if (m->c->outboundMsgs->count > 0)
