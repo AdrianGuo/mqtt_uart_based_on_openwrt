@@ -52,6 +52,7 @@ int Socket_continueWrites(fd_set* pwset);
  */
 /* 链接了Socket的各种信息，链接了处于各种状态的待后续处理的Socket */
 Sockets s;
+/* fd_set集合，只有在Socket_getReadySocket时s.rset_saved的拷贝 */
 static fd_set wset;
 
 /**
@@ -194,9 +195,11 @@ int isReady(int socket, fd_set* read_set, fd_set* write_set)	//-判断socket是否在
 	int rc = 1;
 
 	FUNC_ENTRY;
+	/* 套接字链接挂起且可写。。。。则肯定准备好了。。。不用判断可读????Remove挂起只在此执行 */
 	if  (ListFindItem(s.connect_pending, &socket, intcompare) && FD_ISSET(socket, write_set))	//-判断描述符fd是否在给定的描述符集fdset中，通常配合select函数使用，当检测到fd状态发生变化时返回真，否则，返回假（也可以认为集合中指定的文件描述符是否可以读写）。
 		ListRemoveItem(s.connect_pending, &socket, intcompare);	//-这个套接字上可以写了,说明正在进行了悬挂内容处理结束了,可以从悬挂队列中溢出了
 	else
+		/* 可读且可写，且此套接字没有待发送的内容 */
 		rc = FD_ISSET(socket, read_set) && FD_ISSET(socket, write_set) && Socket_noPendingWrites(socket);
 	FUNC_EXIT_RC(rc);
 	return rc;
@@ -228,6 +231,7 @@ int Socket_getReadySocket(int more_work, struct timeval *tp)	//-如果有的话返回可
 
 	while (s.cur_clientsds != NULL)	//-指向当前的套接字描述符,记录的是一个链表元素,通过这个可以定位到链表中的一个点,然后可以找到所有
 	{
+		/* ????wset的赋值只有s.rset_saved的拷贝*/
 		if (isReady(*((int*)(s.cur_clientsds->content)), &(s.rset), &wset))	//-检查的套接字是准备好可以操作了,现在处于空闲状态
 			break;
 		ListNextElement(s.clientsds, &s.cur_clientsds);
@@ -257,6 +261,7 @@ int Socket_getReadySocket(int more_work, struct timeval *tp)	//-如果有的话返回可
 			goto exit;
 		}
 
+		/* 保存的是Socket_New时添加到Socket链表中的添加至s.rset_saved的描述符 */
 		memcpy((void*)&wset, (void*)&(s.rset_saved), sizeof(wset));	//-检查读的套接字的可写性,
 		//-参数1:是一个整数值，是指集合中所有文件描述符的范围，即所有文件描述符的最大值加1
 		//-参数2:（可选）指针，指向一组等待可读性检查的套接口。
@@ -273,6 +278,8 @@ int Socket_getReadySocket(int more_work, struct timeval *tp)	//-如果有的话返回可
 
 		if (rc == 0 && rc1 == 0)
 			goto exit; /* no work to do */
+
+		/* s.rset链接可读套接字，wset链接可写套接字 */
 		//-到这里说明有可读的套接字,下面从头找到第一可读的返回
 		s.cur_clientsds = s.clientsds->first;
 		while (s.cur_clientsds != NULL)

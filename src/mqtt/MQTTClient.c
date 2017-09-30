@@ -278,7 +278,7 @@ int MQTTClient_create(MQTTClient* handle, const char* serverURI, const char* cli
 		initialized = 1;	//-±£Ö¤½ö½ö³õÊ¼»¯Ò»´Î
 	}
 	m = malloc(sizeof(MQTTClients));
-	/* handleÊÇÃ¿¸ö¿Í»§¶Ëmqtt_new´´½¨Ê±malloc(sizeof(mqtt_client))µÄ1¸ö³ÉÔ±MQTTClient£¬ÔÚÕâÀïÓÃÓÚ¼ÇÂ¼ÊµÌå¶ÔÏómalloc(sizeof(MQTTClients))µÄµØÖ· */
+	/* ????handleÊÇÃ¿¸ö¿Í»§¶Ëmqtt_new´´½¨Ê±malloc(sizeof(mqtt_client))µÄ1¸ö³ÉÔ±MQTTClient£¬ÔÚÕâÀïÓÃÓÚ¼ÇÂ¼ÊµÌå¶ÔÏómalloc(sizeof(MQTTClients))µÄµØÖ· */
 	*handle = m;	//-¸Õ¸Õ´´½¨ÁËÒ»¸ö¿Í»§¶Ë½á¹¹¶ÔÏó,ÓÃÓÚ±£´æÊı¾İ
 	memset(m, '\0', sizeof(MQTTClients));
 	if (strncmp(URI_TCP, serverURI, strlen(URI_TCP)) == 0)	//-Èôstr1Óëstr2µÄÇ°n¸ö×Ö·ûÏàÍ¬£¬Ôò·µ»Ø0
@@ -1801,6 +1801,7 @@ void MQTTClient_yield(void)	//-¿Í»§¶Ë·ÅÆú,ÀïÃæÓĞÖÜÆÚ´¦Àíº¯Êı,¿ÉÒÔÊµÏÖ·¢ËÍºÍ½ÓÊÕ»
 	FUNC_ENTRY;
 	if (running)
 	{
+		/* MQTTClient_runÕıÔÚÔËĞĞ£¬£¨MQTTClient_connectURIVersionÆô¶¯µÄ£© */
 		MQTTClient_sleep(timeout);	//?ÕıÔÚÔËĞĞµÄ»°,ĞİÃßµÈ´ı½áÊø
 		goto exit;
 	}
